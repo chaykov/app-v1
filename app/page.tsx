@@ -1,14 +1,24 @@
 import { sql } from "@vercel/postgres";
+import { NextResponse } from "next/server";
+import { ReactNode, useEffect, useState } from "react";
 
-export default async function Home({ params }: { params: { user: string } }) {
-  const { rows } = await sql`SELECT * from CARTS where user_id=${params.user}`;
+export default async function Home() {
+  const [data, setData] = useState([]);
+  const pets: any = await sql`SELECT * FROM Pets`;
+
+  useEffect(() => {
+    fetch("/api/add-pet")
+      .then((res) => res.json())
+      .then((data) => {
+        setData(pets);
+      })
+      .catch((err) => console.log("Error", err));
+  });
 
   return (
     <div>
-      {rows.map((row) => (
-        <div key={row.id}>
-          {row.id} - {row.quantity}
-        </div>
+      {data.map((pet) => (
+        <p key={pet.id}>{pet.name}</p>
       ))}
     </div>
   );
